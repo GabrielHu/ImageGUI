@@ -1,11 +1,12 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
+from PIL import ImageQt
 
 class imageGUI(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.resize(640,480)
+        self.resize(640, 480)
         self.setWindowTitle("Python Menus & Toolbars")
         self.centralWidget = QLabel(self)
         # Action define
@@ -27,31 +28,46 @@ class imageGUI(QMainWindow):
         menuBar = self.menuBar()
         menuBar.setNativeMenuBar(False)
         self.setMenuBar = menuBar
-        # Creating menus using a QMenu object
+        # Creating menus using a title
         fileMenu = menuBar.addMenu("&File")
         fileMenu.addAction(self.openAction)
-        # Creating menus using a title
+        fileMenu.addAction(self.saveAction)
         editMenu = menuBar.addMenu("&Edit")
 
     def _createActions(self):
-        # Creating actions using the second constructor
+        # Creating actions using the QAction constructor
         self.openAction = QAction("&Open...", self)
         self.openAction.setShortcut("Ctrl+O")
+        self.saveAction = QAction("&Save...", self)
+        self.saveAction.setShortcut("Ctrl+S")
 
     def _connectActions(self):
         # Connect File actions
         self.openAction.triggered.connect(self.openFile)
+        self.saveAction.triggered.connect(self.saveFile)
 
     def _defineActions(self):
         self.openFile = self.loadImage
+        self.saveFile = self.saveImage
 
     def loadImage(self):
         # load image
         try:
-            fname = QFileDialog.getOpenFileName(self,"Select a file...", './',filter="Image Files (*)")
+            fname = QFileDialog.getOpenFileName(
+                self, "Select a file...", './', filter="Image Files (*)")
             imagePath = fname[0]
             pixmap = QPixmap(imagePath).scaledToWidth(640)
             self.centralWidget.setPixmap(pixmap)
             # self.resize(pixmap.width(),pixmap.height())
+        except Exception as e:
+            print(e)
+
+    def saveImage(self):
+        # save image
+        try:
+            fname = QFileDialog.getSaveFileName(self, 'Save image', './', filter="Image Files (*.png, *.jpg, *.bmp)")
+            if fname[0]:
+                image = ImageQt.fromqpixmap(self.centralWidget.pixmap())
+                image.save(fname[0])
         except Exception as e:
             print(e)
