@@ -2,7 +2,6 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QPixmap, QPainter, QPen
 from PyQt5.QtWidgets import *
 from PIL import ImageQt
-from paint import Draw
 
 
 class imageGUI(QMainWindow):
@@ -38,6 +37,7 @@ class imageGUI(QMainWindow):
         fileMenu.addAction(self.saveAction)
         editMenu = menuBar.addMenu("&Edit")
         editMenu.addAction(self.maskAction)
+        editMenu.addAction(self.eraseAction)
 
     def _createActions(self):
         # Creating actions using the QAction constructor
@@ -47,17 +47,21 @@ class imageGUI(QMainWindow):
         self.saveAction.setShortcut("Ctrl+S")
         self.maskAction = QAction("&Manual mask...", self)
         self.maskAction.setShortcut("Ctrl+M")
+        self.eraseAction = QAction("&Erase mask...", self)
+        self.eraseAction.setShortcut("Ctrl+E")
 
     def _connectActions(self):
         # Connect File actions
         self.openAction.triggered.connect(self.openFile)
         self.saveAction.triggered.connect(self.saveFile)
         self.maskAction.triggered.connect(self.maskFile)
+        self.eraseAction.triggered.connect(self.eraseMask)
 
     def _defineActions(self):
         self.openFile = self.loadImage
         self.saveFile = self.saveImage
         self.maskFile = self.maskImage
+        self.eraseMask = self.eraseImage
 
     def loadImage(self):
         # load image
@@ -65,8 +69,8 @@ class imageGUI(QMainWindow):
             fname = QFileDialog.getOpenFileName(
                 self, "Select a file...", './', filter="Image Files (*)")
             imagePath = fname[0]
-            pixmap = QPixmap(imagePath).scaledToWidth(640)
-            self.centralWidget.setPixmap(pixmap)
+            self.pixmap = QPixmap(imagePath).scaledToWidth(640)
+            self.centralWidget.setPixmap(self.pixmap)
         except Exception as e:
             print(e)
 
@@ -86,7 +90,14 @@ class imageGUI(QMainWindow):
         self.maskEdit = True
         self.drawing = False
         self.lastPoint = QPoint()
+
+    def eraseImage(self):
+        # Erase mask
+        self.centralWidget.setPixmap(self.pixmap)
     
+    '''
+        Pointer functions for manual segmentation
+    '''
     def paintEvent(self, event):
         if self.maskEdit:
             painter = QPainter(self)
