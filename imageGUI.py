@@ -10,7 +10,7 @@ class imageGUI(QMainWindow):
         super().__init__()
         # set init UI
         self.resize(640, 480)
-        self.setWindowTitle("Python Menus & Toolbars")
+        self.setWindowTitle("Image Segmentation V0.3")
         self.centralWidget = QLabel(self)
         self.maskEdit = False
         # Action define

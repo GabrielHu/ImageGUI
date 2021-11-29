@@ -7,6 +7,7 @@ from PIL import Image
 from .unet import UNet
 from .utils.data_loading import BasicDataset
 
+# credit to https://github.com/milesial/Pytorch-UNet#prediction 
 
 def predictMask(img):
     net = UNet(n_channels=3, n_classes=2)
