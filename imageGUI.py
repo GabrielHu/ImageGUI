@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QPixmap, QPainter, QPen
 from PyQt5.QtWidgets import *
 from PIL import ImageQt
+from autoPred.QtPrediction import predictMask
 
 
 class imageGUI(QMainWindow):
@@ -37,6 +38,7 @@ class imageGUI(QMainWindow):
         fileMenu.addAction(self.saveAction)
         editMenu = menuBar.addMenu("&Edit")
         editMenu.addAction(self.maskAction)
+        editMenu.addAction(self.autoMaskAction)
         editMenu.addAction(self.eraseAction)
 
     def _createActions(self):
@@ -47,6 +49,8 @@ class imageGUI(QMainWindow):
         self.saveAction.setShortcut("Ctrl+S")
         self.maskAction = QAction("&Manual mask...", self)
         self.maskAction.setShortcut("Ctrl+M")
+        self.autoMaskAction = QAction("&Auto mask...", self)
+        self.autoMaskAction.setShortcut("Ctrl+A")
         self.eraseAction = QAction("&Erase mask...", self)
         self.eraseAction.setShortcut("Ctrl+E")
 
@@ -55,12 +59,14 @@ class imageGUI(QMainWindow):
         self.openAction.triggered.connect(self.openFile)
         self.saveAction.triggered.connect(self.saveFile)
         self.maskAction.triggered.connect(self.maskFile)
+        self.autoMaskAction.triggered.connect(self.autoMaskFile)
         self.eraseAction.triggered.connect(self.eraseMask)
 
     def _defineActions(self):
         self.openFile = self.loadImage
         self.saveFile = self.saveImage
         self.maskFile = self.maskImage
+        self.autoMaskFile = self.autoMaskImage
         self.eraseMask = self.eraseImage
 
     def loadImage(self):
@@ -91,13 +97,24 @@ class imageGUI(QMainWindow):
         self.drawing = False
         self.lastPoint = QPoint()
 
+    def autoMaskImage(self):
+        # auto mask
+        try:
+            image = ImageQt.fromqpixmap(self.pixmap)
+            pred = ImageQt.ImageQt(predictMask(image))
+            self.centralWidget.setPixmap(QPixmap.fromImage(pred))
+        except Exception as e:
+            print(e)
+
     def eraseImage(self):
-        # Erase mask
+        # Erase mask and stop editing
         self.centralWidget.setPixmap(self.pixmap)
-    
+        self.maskEdit = False
+
     '''
         Pointer functions for manual segmentation
     '''
+
     def paintEvent(self, event):
         if self.maskEdit:
             painter = QPainter(self)

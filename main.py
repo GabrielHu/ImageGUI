@@ -3,9 +3,9 @@ from PyQt5.QtWidgets import QApplication
 from imageGUI import imageGUI
 # from controller import control
 
-__version__ = '0.2'
+__version__ = '0.3'
 __author__ = 'Renjiu Hu'
-__doc__ = 'In this version, the figure saving and editing function would be added.'
+__doc__ = 'In this version, the figure could be auto-segmented.'
 
 
 def main():
